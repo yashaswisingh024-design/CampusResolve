@@ -39,9 +39,8 @@ for communication between the frontend and MySQL database.
 - Admin dashboard statistics
 - Student feedback
 
-### Backend Architecture
+Backend Architecture
 
-```text
 Controller
     ↓
 Service
@@ -52,14 +51,14 @@ JDBC
     ↓
 MySQL
 
-### Database
-The backend uses MySQL with the following main tables:
+Database
+
 users
 complaints
 feedback
 
-### API
-The backend exposes REST endpoints for:
+API
+
 Authentication
 Complaint management
 Admin management
