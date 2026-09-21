@@ -7,8 +7,8 @@ public class UserService {
     public UserService() throws SQLException {
     userDAO = new UserDAO();
     }
-    public void registerUser(User user) {
-        userDAO.registerUser(user);
+    public boolean registerUser(User user) {
+         return userDAO.registerUser(user);
     }
     public User loginUser(String email, String password){
         return userDAO.loginUser(email, password);

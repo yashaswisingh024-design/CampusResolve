@@ -6,7 +6,7 @@ Connection con;
 public UserDAO() throws SQLException{
 con=DriverManager.getConnection("jdbc:mysql://localhost:3306/campus_resolve","root",System.getenv("DB_PASSWORD"));
 }
-public void registerUser(User user){
+public boolean registerUser(User user){
     String sql ="INSERT INTO users(name,email,password,role) "+ "VALUES(?,?,?,?)";
     try(PreparedStatement psmt =con.prepareStatement(sql)){
     psmt.setString(1,user.getName());
@@ -15,12 +15,13 @@ public void registerUser(User user){
     psmt.setString(4,"STUDENT");
     int rows = psmt.executeUpdate();
     System.out.println("Rows inserted: " + rows);
-
+      return true;
 }
 
 catch (SQLException e) {
     
    System.out.println("Error="+e);
+   return false;
 }
 }
 public User loginUser(String email,String password) {
