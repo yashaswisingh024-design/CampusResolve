@@ -1,24 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Plus, List, Clock, CheckCircle2, ChevronRight, AlertTriangle } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { useAuth } from '../../context/AuthContext';
-import { useComplaints } from '../../context/ComplaintContext';
 import { Badge } from '../../components/common/Badge';
 
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const { complaints } = useComplaints();
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const userComplaints = complaints.filter(c => c.studentId === user.id);
-  const activeComplaints = userComplaints.filter(c => c.status !== 'Resolved');
-  const recentComplaints = userComplaints.slice(0, 3);
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const res = await fetch(`http://localhost:8080/api/complaints/my?userId=${user.userId}`);
+        if (res.ok) {
+          const data = await res.json();
+          setComplaints(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch complaints', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (user?.userId) fetchComplaints();
+  }, [user]);
+
+  const activeComplaints = complaints.filter(c => c.status?.toUpperCase() !== 'RESOLVED');
+  const recentComplaints = complaints.slice(0, 3);
 
   const stats = [
-    { label: 'Total Reported', value: userComplaints.length, icon: List, color: 'text-slate-600', bg: 'bg-slate-100' },
-    { label: 'In Progress', value: userComplaints.filter(c => c.status === 'In Progress').length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { label: 'Resolved', value: userComplaints.filter(c => c.status === 'Resolved').length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100' },
+    { label: 'Total Reported', value: complaints.length, icon: List, color: 'text-slate-600', bg: 'bg-slate-100' },
+    { label: 'In Progress', value: complaints.filter(c => c.status?.toUpperCase() === 'IN_PROGRESS' || c.status?.toUpperCase() === 'IN PROGRESS').length, icon: Clock, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { label: 'Resolved', value: complaints.filter(c => c.status?.toUpperCase() === 'RESOLVED').length, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100' },
   ];
 
   return (
@@ -52,7 +68,7 @@ export default function StudentDashboard() {
                 <Icon size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                <p className="text-2xl font-bold text-slate-900">{loading ? '-' : stat.value}</p>
                 <p className="text-sm font-medium text-slate-500">{stat.label}</p>
               </div>
             </motion.div>
@@ -70,7 +86,9 @@ export default function StudentDashboard() {
             </Link>
           </div>
 
-          {recentComplaints.length > 0 ? (
+          {loading ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center text-slate-500">Loading...</div>
+          ) : recentComplaints.length > 0 ? (
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
               <div className="divide-y divide-slate-100">
                 {recentComplaints.map(complaint => (
@@ -79,16 +97,15 @@ export default function StudentDashboard() {
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-semibold text-slate-400">{complaint.id}</span>
                         <Badge variant={
-                          complaint.status === 'Resolved' ? 'success' : 
-                          complaint.status === 'In Progress' ? 'primary' : 'default'
+                          complaint.status?.toUpperCase() === 'RESOLVED' ? 'success' : 
+                          (complaint.status?.toUpperCase() === 'IN_PROGRESS' || complaint.status?.toUpperCase() === 'IN PROGRESS') ? 'primary' : 'default'
                         }>
-                          {complaint.status}
+                          {complaint.status?.replace('_', ' ')}
                         </Badge>
-                        {complaint.priority === 'Urgent' && (
-                          <Badge variant="danger" className="flex items-center gap-1"><AlertTriangle size={12}/> Urgent</Badge>
+                        {complaint.priority?.toUpperCase() === 'HIGH' && (
+                          <Badge variant="danger" className="flex items-center gap-1"><AlertTriangle size={12}/> High</Badge>
                         )}
                       </div>
-                      <span className="text-xs text-slate-500">{new Date(complaint.date).toLocaleDateString()}</span>
                     </div>
                     <h3 className="font-semibold text-slate-900 mb-1">{complaint.title}</h3>
                     <p className="text-sm text-slate-500 truncate">{complaint.category} • {complaint.location}</p>
@@ -117,13 +134,15 @@ export default function StudentDashboard() {
           <h2 className="text-lg font-bold text-slate-900 mb-4">Active Updates</h2>
           
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-            {activeComplaints.length > 0 ? (
+            {loading ? (
+              <p className="text-sm text-slate-500 text-center py-4">Loading...</p>
+            ) : activeComplaints.length > 0 ? (
               <div className="space-y-6">
-                {activeComplaints.map(complaint => (
+                {activeComplaints.slice(0, 5).map(complaint => (
                   <div key={complaint.id} className="relative pl-4 border-l-2 border-slate-100">
                     <div className="absolute -left-[9px] top-1 h-4 w-4 rounded-full bg-primary-accent border-2 border-white"></div>
                     <p className="text-sm font-semibold text-slate-900">{complaint.title}</p>
-                    <p className="text-xs text-slate-500 mt-1">{complaint.status} • {complaint.department}</p>
+                    <p className="text-xs text-slate-500 mt-1">{complaint.status?.replace('_', ' ')}</p>
                   </div>
                 ))}
               </div>

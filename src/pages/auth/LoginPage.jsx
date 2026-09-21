@@ -4,7 +4,6 @@ import { Shield, Eye, EyeOff } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { useAuth } from '../../context/AuthContext';
-import { mockUsers } from '../../data/mockUsers';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -16,7 +15,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
@@ -27,23 +26,17 @@ export default function LoginPage() {
 
     setLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      const user = login(email, password);
+    try {
+      const user = await login(email, password);
       setLoading(false);
-      if (user.role === 'admin') {
+      if (user.role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
       }
-    }, 1000);
-  };
-
-  const handleDemoLogin = (role) => {
-    const demoUser = mockUsers.find(u => u.role === role);
-    if (demoUser) {
-      setEmail(demoUser.email);
-      setPassword('demo123');
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Login failed. Please check your credentials.');
     }
   };
 
@@ -129,19 +122,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 rounded border-slate-300 text-primary-accent focus:ring-primary-accent"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
-                Remember me
-              </label>
-            </div>
-
-            <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
+            <Button type="submit" className="w-full h-11 text-base mt-2" disabled={loading}>
               {loading ? (
                 <span className="flex items-center gap-2">
                   <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
@@ -157,18 +138,6 @@ export default function LoginPage() {
               Create account
             </Link>
           </p>
-
-          <div className="mt-10 pt-6 border-t border-slate-200">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 text-center">Demo Access</p>
-            <div className="grid grid-cols-2 gap-3">
-              <Button variant="outline" size="sm" onClick={() => handleDemoLogin('student')}>
-                Login as Student
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => handleDemoLogin('admin')}>
-                Login as Admin
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

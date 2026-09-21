@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { ComplaintProvider } from './context/ComplaintContext';
 import LandingPage from './pages/landing/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
@@ -56,9 +55,7 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ComplaintProvider>
-          <AppRoutes />
-        </ComplaintProvider>
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   );

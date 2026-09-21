@@ -1,11 +1,40 @@
-import React from 'react';
-import { Building, Users, Clock, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Building, Clock } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
-import { departments } from '../../data/mockUsers';
-import { useComplaints } from '../../context/ComplaintContext';
 
 export default function AdminDepartments() {
-  const { complaints } = useComplaints();
+  const [complaints, setComplaints] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Still use mock departments array as they might not come from API directly
+  const departments = [
+    'IT Services', 'Maintenance', 'Electrical', 'Hostel', 'Housekeeping', 'Library', 'Transport', 'Security'
+  ];
+
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/admin/complaints');
+        if (res.ok) {
+          const data = await res.json();
+          setComplaints(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch complaints for departments', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchComplaints();
+  }, []);
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="p-8 text-center text-slate-500">Loading department data...</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -16,10 +45,12 @@ export default function AdminDepartments() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {departments.map((dept, index) => {
-          const deptComplaints = complaints.filter(c => c.department === dept);
-          const open = deptComplaints.filter(c => ['Submitted', 'Reviewed'].includes(c.status)).length;
-          const inProgress = deptComplaints.filter(c => ['Assigned', 'In Progress'].includes(c.status)).length;
-          const resolved = deptComplaints.filter(c => c.status === 'Resolved').length;
+          // Note: Backend doesn't specify department assignment in the provided JSON schema.
+          // This is simulated based on the assumption that department might exist.
+          const deptComplaints = complaints.filter(c => c.department === dept || c.category === dept);
+          const open = deptComplaints.filter(c => ['SUBMITTED', 'UNDER REVIEW'].includes(c.status)).length;
+          const inProgress = deptComplaints.filter(c => ['ASSIGNED', 'IN_PROGRESS', 'IN PROGRESS'].includes(c.status)).length;
+          const resolved = deptComplaints.filter(c => c.status === 'RESOLVED').length;
           
           return (
             <div key={dept} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden group flex flex-col">

@@ -1,24 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Users, FileText, CheckCircle2, AlertTriangle, ChevronRight, BarChart3, TrendingUp } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
-import { useComplaints } from '../../context/ComplaintContext';
-import { departments } from '../../data/mockUsers';
 
 export default function AdminDashboard() {
-  const { complaints } = useComplaints();
+  const [data, setData] = useState({
+    total: 0,
+    submitted: 0,
+    underReview: 0,
+    inProgress: 0,
+    resolved: 0
+  });
+  const [loading, setLoading] = useState(true);
 
-  const total = complaints.length;
-  const inProgress = complaints.filter(c => c.status === 'In Progress').length;
-  const resolved = complaints.filter(c => c.status === 'Resolved').length;
-  const urgent = complaints.filter(c => c.priority === 'Urgent').length;
+  useEffect(() => {
+    const fetchDashboardStats = async () => {
+      try {
+        const res = await fetch('http://localhost:8080/api/admin/dashboard/full');
+        if (res.ok) {
+          const stats = await res.json();
+          setData(stats);
+        }
+      } catch (err) {
+        console.error('Failed to fetch admin dashboard stats', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboardStats();
+  }, []);
 
   const stats = [
-    { label: 'Total Complaints', value: total, icon: FileText, color: 'text-slate-600', bg: 'bg-slate-100' },
-    { label: 'In Progress', value: inProgress, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-100' },
-    { label: 'Resolved', value: resolved, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100' },
-    { label: 'Urgent', value: urgent, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-100' },
+    { label: 'Total Complaints', value: data.total, icon: FileText, color: 'text-slate-600', bg: 'bg-slate-100' },
+    { label: 'In Progress', value: data.inProgress, icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { label: 'Resolved', value: data.resolved, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-100' },
+    { label: 'Under Review', value: data.underReview, icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-100' },
   ];
 
   return (
@@ -43,7 +60,7 @@ export default function AdminDashboard() {
                 <Icon size={24} />
               </div>
               <div>
-                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                <p className="text-2xl font-bold text-slate-900">{loading ? '-' : stat.value}</p>
                 <p className="text-sm font-medium text-slate-500">{stat.label}</p>
               </div>
             </motion.div>
@@ -52,57 +69,23 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Department Workload (Mock Chart) */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-slate-900">Department Workload</h2>
-            <Link to="/admin/departments" className="text-sm font-medium text-primary-accent hover:text-blue-700">
-              View all
-            </Link>
-          </div>
-          <div className="space-y-4">
-            {departments.slice(0, 5).map(dept => {
-              const count = complaints.filter(c => c.department === dept).length;
-              const max = Math.max(...departments.map(d => complaints.filter(c => c.department === d).length), 1);
-              const percentage = (count / max) * 100;
-              return (
-                <div key={dept}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="font-medium text-slate-700">{dept}</span>
-                    <span className="text-slate-500">{count} active</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary-accent rounded-full" 
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Needs Attention */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-slate-900">Needs Attention</h2>
             <Link to="/admin/complaints" className="text-sm font-medium text-primary-accent hover:text-blue-700">
-              View all
+              Go to full complaint management
             </Link>
           </div>
-          <div className="divide-y divide-slate-100">
-            {complaints.filter(c => c.priority === 'Urgent' || c.status === 'Submitted').slice(0, 4).map(complaint => (
-              <div key={complaint.id} className="py-3 flex items-start gap-3">
-                <div className={`mt-0.5 h-2 w-2 rounded-full ${complaint.priority === 'Urgent' ? 'bg-red-500 animate-pulse' : 'bg-amber-500'}`}></div>
-                <div>
-                  <Link to={`/admin/complaints?id=${complaint.id}`} className="text-sm font-semibold text-slate-900 hover:text-primary-accent block mb-0.5">
-                    {complaint.title}
-                  </Link>
-                  <p className="text-xs text-slate-500">{complaint.id} • {complaint.department}</p>
-                </div>
-              </div>
-            ))}
+          <p className="text-slate-600 text-sm">
+            You currently have <strong>{data.submitted}</strong> newly submitted complaints waiting for review, and <strong>{data.underReview}</strong> complaints under review.
+          </p>
+          <div className="mt-4">
+            <Link to="/admin/complaints?status=SUBMITTED">
+              <button className="bg-primary-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                Review New Complaints
+              </button>
+            </Link>
           </div>
         </div>
       </div>
