@@ -14,9 +14,8 @@ public class FeedbackController {
         feedbackService= new FeedbackService();
     }
 @PostMapping ("/api/feedback")
-public String addFeedback(@RequestBody Feedback feedback){
-    feedbackService.addFeedback(feedback);
-    return "Feedback submitted";
+public Feedback addFeedback(@RequestBody Feedback feedback){
+    return feedbackService.addFeedback(feedback);
 }
 @GetMapping ("/api/feedback/{complaintId}")
 public Feedback getFeedback(@PathVariable int complaintId) throws SQLException{

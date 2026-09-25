@@ -9,8 +9,8 @@ public class ComplaintService {
 public ComplaintService() throws SQLException{
     complaintDAO= new ComplaintDAO();
 }
-public void addComplaint(Complaint complaint){
-    complaintDAO.addComplaint(complaint);
+public Complaint addComplaint(Complaint complaint){
+    return complaintDAO.addComplaint(complaint);
 }
 public List<Complaint> getMyComplaint(int userId) throws SQLException{
     return complaintDAO.getMyComplaint(userId);

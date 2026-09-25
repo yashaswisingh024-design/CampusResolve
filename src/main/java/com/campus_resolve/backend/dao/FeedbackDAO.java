@@ -7,20 +7,24 @@ public class FeedbackDAO {
     public FeedbackDAO() throws SQLException{
          con =DriverManager.getConnection("jdbc:mysql://localhost:3306/campus_resolve","root",System.getenv("DB_PASSWORD"));
     }
-    public void addFeedback(Feedback feedback){
+    public Feedback addFeedback(Feedback feedback){
     String sql="INSERT INTO feedback(complaint_id,user_id,rating,comment) "+" VALUES(?,?,?,?)";
-    try(PreparedStatement psmt =con.prepareStatement(sql)){
+    try(PreparedStatement psmt =con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
         psmt.setInt(1,feedback.getComplaintId());
         psmt.setInt(2,feedback.getUserId());
         psmt.setInt(3,feedback.getRating());
         psmt.setString(4,feedback.getComment());
         psmt.executeUpdate();
-        System.out.println("Feedback submitted");
+        ResultSet rs = psmt.getGeneratedKeys();
+        if(rs.next()){
+            feedback.setFeedbackId(rs.getInt(1));
+        }
+    return feedback;
     }
-    catch (SQLException e) {
-    
-   System.out.println("Error="+e);
-}
+    catch(SQLException e) {
+        System.out.println("Error=" + e);
+        return null;
+    }
 }
 public Feedback getFeedback(int complaintId) throws SQLException{
     String sql="SELECT *"+ " FROM feedback "+" WHERE complaint_id=?";

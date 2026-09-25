@@ -10,8 +10,8 @@ public class FeedbackService {
     public FeedbackService() throws SQLException{
         feedbackDAO=new FeedbackDAO();
     }
-    public void addFeedback(Feedback feedback){
-        feedbackDAO.addFeedback(feedback);
+    public Feedback addFeedback(Feedback feedback){
+        return feedbackDAO.addFeedback(feedback);
 
     }
     public Feedback getFeedback(int complaintId) throws SQLException{

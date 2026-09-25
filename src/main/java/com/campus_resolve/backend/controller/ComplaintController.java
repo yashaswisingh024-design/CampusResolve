@@ -20,9 +20,8 @@ public class ComplaintController {
     complaintService = new ComplaintService();
 }
 @PostMapping("/api/complaints")
-public String complaints(@RequestBody Complaint complaint) {
-    complaintService.addComplaint(complaint);
-    return "Complaint submitted successfully";
+public Complaint complaints(@RequestBody Complaint complaint) {
+    return complaintService.addComplaint(complaint);
 }
 @GetMapping("/api/complaints/my")
 public List<Complaint> complaints(@RequestParam int userId) throws SQLException{

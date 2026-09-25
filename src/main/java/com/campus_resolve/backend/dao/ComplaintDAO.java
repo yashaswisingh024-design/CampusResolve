@@ -9,10 +9,10 @@ public class ComplaintDAO {
 public ComplaintDAO() throws SQLException{
 con=DriverManager.getConnection("jdbc:mysql://localhost:3306/campus_resolve","root",System.getenv("DB_PASSWORD"));
 }
-public void addComplaint(Complaint complaint) {
+public Complaint addComplaint(Complaint complaint) {
     String sql="INSERT INTO complaints(user_id, title, description, location, category, image)"+ 
     " VALUES (?,?,?,?,?,?)";
-    try(PreparedStatement psmt =con.prepareStatement(sql)){
+    try(PreparedStatement psmt =con.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
         psmt.setInt(1, complaint.getUserId());
         psmt.setString(2, complaint.getTitle());
         psmt.setString(3, complaint.getDescription());
@@ -21,9 +21,16 @@ public void addComplaint(Complaint complaint) {
         psmt.setString(6, complaint.getImage());
         int rows = psmt.executeUpdate();
         System.out.println("Rows inserted: " + rows);
+        ResultSet rs = psmt.getGeneratedKeys();
+        if (rs.next()) {
+            complaint.setComplaintId(rs.getInt(1));
+}
+Complaint savedComplaint = getComplaint(complaint.getComplaintId());
+return savedComplaint;
 }
 catch (SQLException e) {
     System.out.println("Error="+e);
+    return null;
 }
 }
 public List<Complaint> getMyComplaint(int userId) throws SQLException {

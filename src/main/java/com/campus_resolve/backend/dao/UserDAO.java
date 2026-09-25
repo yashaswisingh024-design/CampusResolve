@@ -25,13 +25,14 @@ catch (SQLException e) {
 }
 }
 public User loginUser(String email,String password) {
-   String sql = "SELECT name,email,password,role"+" FROM users "+" WHERE email=?"+" AND password=?";
+   String sql = "SELECT user_id,name,email,password,role"+" FROM users "+" WHERE email=?"+" AND password=?";
   try( PreparedStatement psmt = con.prepareStatement(sql)){
    psmt.setString(1,email);
    psmt.setString(2,password);
    ResultSet rs = psmt.executeQuery();
    if(rs.next()){
    User user = new User();
+   user.setUserId(rs.getInt("user_id"));
    user.setName(rs.getString("name"));
    user.setEmail(rs.getString("email"));
    user.setPassword(rs.getString("password"));

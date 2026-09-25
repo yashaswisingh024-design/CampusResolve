@@ -33,6 +33,7 @@ if (loggedInUser == null) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 LoginRespone response = new LoginRespone();
+response.setUserId(loggedInUser.getUserId());
 response.setName(loggedInUser.getName());
 response.setEmail(loggedInUser.getEmail());
 response.setRole(loggedInUser.getRole());
