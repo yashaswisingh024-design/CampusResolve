@@ -3,15 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
-import { useAuth } from '../../context/AuthContext';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
-    studentId: '',
-    department: '',
-    year: '',
     password: '',
     confirmPassword: ''
   });
@@ -21,7 +17,6 @@ export default function RegisterPage() {
   const [success, setSuccess] = useState(false);
   
   const navigate = useNavigate();
-  const { loginAsRole } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,12 +30,11 @@ export default function RegisterPage() {
     return { label: 'Strong', color: 'bg-green-500', width: 'w-full' };
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
-    // Basic validation
-    if (Object.values(formData).some(val => !val)) {
+    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return;
     }
@@ -52,15 +46,30 @@ export default function RegisterPage() {
 
     setLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Registration failed. Email might already be in use.');
+      }
+
       setLoading(false);
       setSuccess(true);
       setTimeout(() => {
-        loginAsRole('student');
-        navigate('/dashboard');
-      }, 1500);
-    }, 1500);
+        navigate('/login');
+      }, 2000);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Server error occurred');
+    }
   };
 
   if (success) {
@@ -71,7 +80,7 @@ export default function RegisterPage() {
             <CheckCircle2 size={40} className="text-green-600" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">Account Created!</h2>
-          <p className="text-slate-600 mb-8">Your account has been successfully created. Redirecting you to the dashboard...</p>
+          <p className="text-slate-600 mb-8">Your account has been successfully created. Redirecting you to login...</p>
         </div>
       </div>
     );
@@ -130,9 +139,9 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               label="Full name"
-              name="fullName"
+              name="name"
               placeholder="Alex Johnson"
-              value={formData.fullName}
+              value={formData.name}
               onChange={handleChange}
             />
             
@@ -144,49 +153,6 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={handleChange}
             />
-
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Student ID"
-                name="studentId"
-                placeholder="STU-2024-..."
-                value={formData.studentId}
-                onChange={handleChange}
-              />
-              <div className="w-full">
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Year</label>
-                <select
-                  name="year"
-                  className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-transparent transition-all shadow-sm"
-                  value={formData.year}
-                  onChange={handleChange}
-                >
-                  <option value="">Select Year</option>
-                  <option value="1st Year">1st Year</option>
-                  <option value="2nd Year">2nd Year</option>
-                  <option value="3rd Year">3rd Year</option>
-                  <option value="4th Year">4th Year</option>
-                  <option value="Postgraduate">Postgraduate</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="w-full">
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Department</label>
-              <select
-                name="department"
-                className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-transparent transition-all shadow-sm"
-                value={formData.department}
-                onChange={handleChange}
-              >
-                <option value="">Select Department</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Engineering">Engineering</option>
-                <option value="Business">Business</option>
-                <option value="Arts">Arts</option>
-                <option value="Sciences">Sciences</option>
-              </select>
-            </div>
             
             <div className="relative pt-2">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Password</label>

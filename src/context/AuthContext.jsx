@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { mockUsers } from '../data/mockUsers';
 
 const AuthContext = createContext();
 
@@ -16,28 +15,21 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, []);
 
-  const login = (email, password) => {
-    // Demo login: find user by email or fallback to student
-    let foundUser = mockUsers.find(u => u.email === email);
-    if (!foundUser) {
-      // For demo purposes, if email contains 'admin', login as admin, else student
-      if (email.includes('admin')) {
-        foundUser = mockUsers.find(u => u.role === 'admin');
-      } else {
-        foundUser = mockUsers.find(u => u.role === 'student');
-      }
-    }
-    
-    setUser(foundUser);
-    localStorage.setItem('campusresolve_user', JSON.stringify(foundUser));
-    return foundUser;
-  };
+  const login = async (email, password) => {
+    const response = await fetch('http://localhost:8080/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-  const loginAsRole = (role) => {
-    const foundUser = mockUsers.find(u => u.role === role);
-    setUser(foundUser);
-    localStorage.setItem('campusresolve_user', JSON.stringify(foundUser));
-    return foundUser;
+    if (!response.ok) {
+      throw new Error('Invalid credentials or server error');
+    }
+
+    const data = await response.json();
+    setUser(data);
+    localStorage.setItem('campusresolve_user', JSON.stringify(data));
+    return data;
   };
 
   const logout = () => {
@@ -46,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loginAsRole, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
