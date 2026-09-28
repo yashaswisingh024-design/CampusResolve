@@ -37,7 +37,7 @@ export const DashboardLayout = ({ children }) => {
     { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
   ];
 
-  const links = user?.role === 'admin' ? adminLinks : studentLinks;
+  const links = user?.role === 'ADMIN' ? adminLinks : studentLinks;
 
   const handleLogout = () => {
     logout();

@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children, allowedRole }) => {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (allowedRole && user.role !== allowedRole) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />;
+    return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/dashboard'} replace />;
   }
   
   return children;
@@ -34,16 +34,16 @@ const AppRoutes = () => {
       <Route path="/register" element={<RegisterPage />} />
 
       {/* Student Routes */}
-      <Route path="/dashboard" element={<ProtectedRoute allowedRole="student"><StudentDashboard /></ProtectedRoute>} />
-      <Route path="/report" element={<ProtectedRoute allowedRole="student"><ReportIssue /></ProtectedRoute>} />
-      <Route path="/complaints" element={<ProtectedRoute allowedRole="student"><StudentComplaints /></ProtectedRoute>} />
-      <Route path="/complaints/:id" element={<ProtectedRoute allowedRole="student"><ComplaintDetails /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute allowedRole="STUDENT"><StudentDashboard /></ProtectedRoute>} />
+      <Route path="/report" element={<ProtectedRoute allowedRole="STUDENT"><ReportIssue /></ProtectedRoute>} />
+      <Route path="/complaints" element={<ProtectedRoute allowedRole="STUDENT"><StudentComplaints /></ProtectedRoute>} />
+      <Route path="/complaints/:id" element={<ProtectedRoute allowedRole="STUDENT"><ComplaintDetails /></ProtectedRoute>} />
 
       {/* Admin Routes */}
-      <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><AdminDashboard /></ProtectedRoute>} />
-      <Route path="/admin/complaints" element={<ProtectedRoute allowedRole="admin"><AdminComplaints /></ProtectedRoute>} />
-      <Route path="/admin/departments" element={<ProtectedRoute allowedRole="admin"><AdminDepartments /></ProtectedRoute>} />
-      <Route path="/admin/analytics" element={<ProtectedRoute allowedRole="admin"><Analytics /></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute allowedRole="ADMIN"><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/complaints" element={<ProtectedRoute allowedRole="ADMIN"><AdminComplaints /></ProtectedRoute>} />
+      <Route path="/admin/departments" element={<ProtectedRoute allowedRole="ADMIN"><AdminDepartments /></ProtectedRoute>} />
+      <Route path="/admin/analytics" element={<ProtectedRoute allowedRole="ADMIN"><Analytics /></ProtectedRoute>} />
       
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
