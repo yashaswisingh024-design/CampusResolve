@@ -12,6 +12,9 @@ public ComplaintService() throws SQLException{
 public Complaint addComplaint(Complaint complaint){
     return complaintDAO.addComplaint(complaint);
 }
+public void updateImage(int complaintId, String imageName) {
+    complaintDAO.updateImage(complaintId, imageName);
+}
 public List<Complaint> getMyComplaint(int userId) throws SQLException{
     return complaintDAO.getMyComplaint(userId);
 
