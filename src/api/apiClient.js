@@ -65,6 +65,10 @@ export const authApi = {
     method: 'POST',
     body: JSON.stringify({ name, email, password }),
   }),
+  googleLogin: (credential) => fetchApi('/api/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ credential }),
+  }),
 };
 
 export const complaintApi = {

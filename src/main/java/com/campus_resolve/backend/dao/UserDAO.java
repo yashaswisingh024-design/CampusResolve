@@ -47,5 +47,28 @@ public User loginUser(String email,String password) {
     System.out.println("Error="+e);
     return null;
 }
+}
+public User getUserByEmail(String email) {
+   String sql = "SELECT user_id,name,email,password,role FROM users WHERE email=?";
+  try( PreparedStatement psmt = con.prepareStatement(sql)){
+   psmt.setString(1,email);
+   ResultSet rs = psmt.executeQuery();
+   if(rs.next()){
+   User user = new User();
+   user.setUserId(rs.getInt("user_id"));
+   user.setName(rs.getString("name"));
+   user.setEmail(rs.getString("email"));
+   user.setPassword(rs.getString("password"));
+   user.setRole(rs.getString("role"));
+   return user;
+   }
+   else{
+   return null;
+   }
+}
+   catch (SQLException e) {
+    System.out.println("Error="+e);
+    return null;
+}
 }  
 }

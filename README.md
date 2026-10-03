@@ -32,12 +32,14 @@ The backend is developed using Java and Spring Boot, providing REST APIs connect
 Make sure your Spring Boot backend is running locally (usually on port `8080`) before starting the frontend.
 
 ### Environment Configuration
-The frontend uses a `.env` file to locate the backend API.
+The frontend uses a `.env` file to locate the backend API and authenticate with Google.
 A default `.env` file is included with:
 ```env
 VITE_API_BASE_URL=http://localhost:8080
+VITE_GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 ```
-Change this if your backend runs on a different port or server.
+Change these if your backend runs on a different port, or to use your own Google OAuth Client ID. 
+*(Note: To use Google Sign-In fully, you must configure an OAuth Client in Google Cloud Console with authorized origins matching your frontend domain/localhost).*
 
 ### 🚀 Run Locally
 
@@ -51,6 +53,7 @@ npm run dev
 The frontend will be available at `http://localhost:5173`.
 
 ## 🏗️ Recent Updates
+- **Added Google Sign-In**: Users can now register/login using their official `@apsit.edu.in` Google accounts, automatically mapped to their roles in the system.
 - Overhauled Landing, Login, and Registration pages into a modern, polished product experience.
 - Completely removed all legacy mock JSON data and simulated responses.
 - Implemented `apiClient.js` to intelligently handle network errors (e.g. `Failed to fetch` -> "Unable to connect to the server").

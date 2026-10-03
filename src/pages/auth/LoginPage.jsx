@@ -4,6 +4,7 @@ import { Shield, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 
 export default function LoginPage() {
@@ -13,8 +14,25 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError('');
+    setLoading(true);
+    try {
+      const user = await googleLogin(credentialResponse.credential);
+      if (user.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Google Sign-In failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,6 +167,23 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          <div className="mt-6 flex items-center justify-between">
+            <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
+            <span className="text-xs text-slate-500 font-medium uppercase">Or continue with</span>
+            <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
+          </div>
+
+          <div className="mt-6 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError('Google Sign-In failed')}
+              useOneTap
+              theme="outline"
+              size="large"
+              width="100%"
+            />
+          </div>
 
           <p className="mt-8 text-center text-sm text-slate-500 font-medium">
             Don't have an account?{' '}

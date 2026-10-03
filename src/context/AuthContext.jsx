@@ -23,13 +23,20 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const googleLogin = async (credential) => {
+    const data = await authApi.googleLogin(credential);
+    setUser(data);
+    localStorage.setItem('campusresolve_user', JSON.stringify(data));
+    return data;
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('campusresolve_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, googleLogin, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

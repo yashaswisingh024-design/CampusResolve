@@ -39,7 +39,50 @@ response.setEmail(loggedInUser.getEmail());
 response.setRole(loggedInUser.getRole());
     return ResponseEntity.ok(response);
 }
-} 
+
+@PostMapping("/api/auth/google")
+public ResponseEntity<?> googleLogin(@RequestBody java.util.Map<String, String> payload) {
+    String idToken = payload.get("credential");
+    if (idToken == null || idToken.isBlank()) {
+        return ResponseEntity.badRequest().body("Token missing");
+    }
+
+    org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+    String googleUrl = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
+    try {
+        java.util.Map<String, Object> googleResponse = restTemplate.getForObject(googleUrl, java.util.Map.class);
+        if (googleResponse == null || googleResponse.containsKey("error")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Google Token");
+        }
+        
+        String email = (String) googleResponse.get("email");
+        String name = (String) googleResponse.get("name");
+        
+        if (email == null || !email.endsWith("@apsit.edu.in")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Please use your APSIT college Google account (@apsit.edu.in) to continue.");
+        }
+        
+        User user = userService.getUserByEmail(email);
+        if (user == null) {
+            user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(""); // No password for Google users
+            userService.registerUser(user);
+            user = userService.getUserByEmail(email);
+        }
+        
+        LoginRespone response = new LoginRespone();
+        response.setUserId(user.getUserId());
+        response.setName(user.getName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRole());
+        return ResponseEntity.ok(response);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Failed to verify Google Token");
+    }
+}
+}
 
 
 
