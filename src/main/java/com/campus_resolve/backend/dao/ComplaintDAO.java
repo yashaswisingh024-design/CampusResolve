@@ -2,7 +2,6 @@ package com.campus_resolve.backend.dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.campus_resolve.backend.model.Complaint;
 public class ComplaintDAO {
     Connection con;
@@ -129,6 +128,20 @@ public List<Complaint> getFilteredComplaints(String category,String priority,Str
             Comp.add(complaint);
         }
         return Comp;
+    }
+}
+public void updateImage(int complaintId, String imageName) {
+    String sql = "UPDATE complaints SET image = ? WHERE complaint_id = ?";
+
+    try (PreparedStatement psmt = con.prepareStatement(sql)) {
+        psmt.setString(1, imageName);
+        psmt.setInt(2, complaintId);
+
+        psmt.executeUpdate();
+
+        System.out.println("Image updated successfully");
+    } catch (SQLException e) {
+        System.out.println("Error=" + e);
     }
 }
 public void updatePriority(int complaintId,String new_priority) {
