@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authApi } from '../api/apiClient';
 
 const AuthContext = createContext();
 
@@ -16,17 +17,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const response = await fetch('http://localhost:8080/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Invalid credentials or server error');
-    }
-
-    const data = await response.json();
+    const data = await authApi.login(email, password);
     setUser(data);
     localStorage.setItem('campusresolve_user', JSON.stringify(data));
     return data;

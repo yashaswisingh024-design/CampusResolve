@@ -10,48 +10,50 @@ import StudentComplaints from './pages/student/StudentComplaints';
 import ComplaintDetails from './pages/student/ComplaintDetails';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminComplaints from './pages/admin/AdminComplaints';
-import AdminDepartments from './pages/admin/AdminDepartments';
 import Analytics from './pages/admin/Analytics';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user, isLoading } = useAuth();
-  
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 rounded-full border-3 border-blue-600 border-t-transparent animate-spin" />
+          <p className="text-slate-500 text-sm font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
   if (!user) return <Navigate to="/login" replace />;
   if (allowedRole && user.role !== allowedRole) {
     return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/dashboard'} replace />;
   }
-  
   return children;
 };
 
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
-      {/* Student Routes */}
       <Route path="/dashboard" element={<ProtectedRoute allowedRole="STUDENT"><StudentDashboard /></ProtectedRoute>} />
       <Route path="/report" element={<ProtectedRoute allowedRole="STUDENT"><ReportIssue /></ProtectedRoute>} />
       <Route path="/complaints" element={<ProtectedRoute allowedRole="STUDENT"><StudentComplaints /></ProtectedRoute>} />
-      <Route path="/complaints/:id" element={<ProtectedRoute allowedRole="STUDENT"><ComplaintDetails /></ProtectedRoute>} />
+      <Route path="/complaints/:complaintId" element={<ProtectedRoute allowedRole="STUDENT"><ComplaintDetails /></ProtectedRoute>} />
 
-      {/* Admin Routes */}
       <Route path="/admin" element={<ProtectedRoute allowedRole="ADMIN"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/complaints" element={<ProtectedRoute allowedRole="ADMIN"><AdminComplaints /></ProtectedRoute>} />
-      <Route path="/admin/departments" element={<ProtectedRoute allowedRole="ADMIN"><AdminDepartments /></ProtectedRoute>} />
       <Route path="/admin/analytics" element={<ProtectedRoute allowedRole="ADMIN"><Analytics /></ProtectedRoute>} />
-      
-      {/* Fallback */}
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
@@ -60,5 +62,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;

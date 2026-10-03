@@ -8,10 +8,17 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0f172a', // slate-900 (Deep Navy / Midnight Blue)
-          accent: '#2563eb',  // blue-600 (Electric / Royal Blue)
-          soft: '#eff6ff',    // blue-50 (Soft Blue)
+          DEFAULT: '#0f172a', // Deep Navy
+          accent: '#2563eb',  // Electric Blue
+          soft: '#eff6ff',    // Soft Blue
           glow: 'rgba(37, 99, 235, 0.5)'
+        },
+        brand: {
+          teal: '#2F858E',    // From screenshots (Circle hero bg)
+          peach: '#EBCFB7',   // From screenshots (buttons, backgrounds)
+          coral: '#E7B5A3',   // From screenshots (accents, blobs)
+          sand: '#F7EFE5',    // From screenshots (off-white bg)
+          dark: '#222B33',    // From screenshots (charcoal text)
         }
       },
       fontFamily: {

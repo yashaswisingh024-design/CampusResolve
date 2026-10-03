@@ -33,7 +33,6 @@ export const DashboardLayout = ({ children }) => {
   const adminLinks = [
     { name: 'Overview', path: '/admin', icon: LayoutDashboard },
     { name: 'All Complaints', path: '/admin/complaints', icon: List },
-    { name: 'Departments', path: '/admin/departments', icon: Building },
     { name: 'Analytics', path: '/admin/analytics', icon: BarChart3 },
   ];
 

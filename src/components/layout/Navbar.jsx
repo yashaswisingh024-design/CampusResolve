@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Shield, Menu, X } from 'lucide-react';
-import { Button } from '../common/Button';
-import { cn } from '../../utils/cn';
+import { Link } from 'react-router-dom';
+import { Shield, Menu, X, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export const Navbar = () => {
+export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -15,65 +13,114 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const scrollToSection = (id) => {
+    setMobileOpen(false);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const navLinks = [
+    { label: 'Features', id: 'features' },
+    { label: 'How it works', id: 'process' },
+    { label: 'Impact', id: 'impact' },
+  ];
+
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        scrolled ? "bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm py-3" : "bg-transparent py-5"
-      )}
-    >
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-lg shadow-sm border-b border-slate-200/50 py-3' : 'bg-transparent py-5'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
+          {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="bg-primary-accent rounded-lg p-2 text-white shadow-sm group-hover:shadow-md transition-shadow">
-              <Shield size={22} className="stroke-[2.5]" />
+            <div className={`rounded-xl p-2 transition-colors ${scrolled ? 'bg-[#2F858E] text-white shadow-md' : 'bg-white/20 backdrop-blur-md text-white shadow-lg'}`}>
+              <Shield size={24} className="stroke-[2.5]" />
             </div>
-            <span className="font-bold text-xl tracking-tight text-slate-900">
-              Campus<span className="text-primary-accent">Resolve</span>
+            <span className="font-bold text-2xl tracking-tight">
+              <span className={scrolled ? 'text-[#222B33]' : 'text-white'}>Campus</span>
+              <span className={scrolled ? 'text-[#2F858E]' : 'text-[#EBCFB7]'}>Resolve</span>
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium text-slate-600 hover:text-primary-accent transition-colors">Features</a>
-            <a href="#how-it-works" className="text-sm font-medium text-slate-600 hover:text-primary-accent transition-colors">How it works</a>
-            <a href="#impact" className="text-sm font-medium text-slate-600 hover:text-primary-accent transition-colors">Impact</a>
-          </nav>
+          <div className="hidden lg:flex items-center gap-2">
+            {navLinks.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => scrollToSection(link.id)}
+                className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                  scrolled ? 'text-slate-600 hover:text-[#2F858E] hover:bg-[#2F858E]/10' : 'text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            <Link to="/login">
-              <Button variant="ghost" size="sm" className="font-semibold">Sign in</Button>
+          {/* Desktop Auth */}
+          <div className="hidden lg:flex items-center gap-4">
+            <Link
+              to="/login"
+              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                scrolled ? 'text-[#222B33] hover:text-[#2F858E]' : 'text-white hover:text-[#EBCFB7]'
+              }`}
+            >
+              Sign in
             </Link>
-            <Link to="/register">
-              <Button size="sm" className="font-semibold shadow-primary-accent/25 shadow-lg">Get started</Button>
+            <Link
+              to="/register"
+              className={`group flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold shadow-lg transition-all duration-300 ${
+                scrolled ? 'bg-[#222B33] text-white hover:bg-[#2F858E] hover:-translate-y-0.5' : 'bg-[#EBCFB7] text-[#222B33] hover:bg-white hover:-translate-y-0.5'
+              }`}
+            >
+              Get Started
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
-          {/* Mobile Menu Toggle */}
+          {/* Mobile Toggle */}
           <button
-            className="md:hidden p-2 text-slate-600"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-lg"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen
+              ? <X size={28} className={scrolled ? 'text-[#222B33]' : 'text-white'} />
+              : <Menu size={28} className={scrolled ? 'text-[#222B33]' : 'text-white'} />
+            }
           </button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-lg px-4 py-6 flex flex-col gap-4">
-          <a href="#features" className="text-base font-medium text-slate-800" onClick={() => setMobileMenuOpen(false)}>Features</a>
-          <a href="#how-it-works" className="text-base font-medium text-slate-800" onClick={() => setMobileMenuOpen(false)}>How it works</a>
-          <a href="#impact" className="text-base font-medium text-slate-800" onClick={() => setMobileMenuOpen(false)}>Impact</a>
-          <hr className="border-slate-100 my-2" />
-          <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-            <Button variant="outline" className="w-full">Sign in</Button>
-          </Link>
-          <Link to="/register" onClick={() => setMobileMenuOpen(false)}>
-            <Button className="w-full">Get started</Button>
-          </Link>
-        </div>
-      )}
-    </header>
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden bg-white border-b border-slate-200 shadow-xl overflow-hidden absolute top-full left-0 right-0"
+          >
+            <div className="px-6 py-8 space-y-2">
+              {navLinks.map((link) => (
+                <button
+                  key={link.id}
+                  onClick={() => scrollToSection(link.id)}
+                  className="block w-full text-left px-4 py-4 rounded-2xl text-[#222B33] font-bold text-lg hover:bg-slate-50 transition-colors"
+                >
+                  {link.label}
+                </button>
+              ))}
+              <div className="pt-6 mt-6 border-t border-slate-100 space-y-3">
+                <Link to="/login" className="block w-full text-center px-4 py-4 rounded-2xl text-[#222B33] font-bold text-lg hover:bg-slate-50 transition-colors" onClick={() => setMobileOpen(false)}>
+                  Sign in
+                </Link>
+                <Link to="/register" className="block w-full text-center px-4 py-4 rounded-2xl bg-[#222B33] text-white font-bold text-lg shadow-lg" onClick={() => setMobileOpen(false)}>
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
   );
-};
+}
