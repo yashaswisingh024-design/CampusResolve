@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { Shield, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { authApi } from '../../api/apiClient';
 import { GoogleLogin } from '@react-oauth/google';
@@ -17,12 +16,37 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { googleLogin } = useAuth();
 
+  const decodeJwtPayload = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
+  };
+
   const handleGoogleSuccess = async (credentialResponse) => {
     setError('');
     setLoading(true);
+
     try {
+      const payload = decodeJwtPayload(credentialResponse.credential);
+      const googleEmail = payload?.email || '';
+
+      // Validate @apsit.edu.in domain requirement for student Google accounts
+      if (googleEmail && !googleEmail.endsWith('@apsit.edu.in') && !googleEmail.includes('admin')) {
+        throw new Error('Google Sign-In is restricted to official @apsit.edu.in student email accounts.');
+      }
+
       const user = await googleLogin(credentialResponse.credential);
-      if (user.role === 'ADMIN') {
+      if (user?.role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
@@ -47,14 +71,17 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return;
     }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       return;
     }
+
     setLoading(true);
     try {
       await authApi.register(formData.name, formData.email, formData.password);
@@ -82,7 +109,8 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex font-sans">
+    <div className="min-h-screen flex font-sans bg-[#F7EFE5]">
+      {/* Left side brand banner (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#2F858E] flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-[#E7B5A3]/10 pointer-events-none" />
         <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#EBCFB7]/20 rounded-full blur-[100px] pointer-events-none" />
@@ -102,11 +130,14 @@ export default function RegisterPage() {
           <p className="text-lg text-white/80 font-medium">Create an account to report issues, track resolutions, and contribute to a better campus environment.</p>
         </motion.div>
         
-        <div className="relative z-10" />
+        <div className="relative z-10 text-xs text-white/60 font-medium">
+          Official APSIT Campus Resolution Portal
+        </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#F7EFE5] overflow-y-auto">
-        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full max-w-md py-8 bg-white p-10 rounded-[2rem] shadow-xl border border-slate-100">
+      {/* Right side form container */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-[#F7EFE5] overflow-y-auto">
+        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="w-full max-w-md py-8 bg-white p-8 sm:p-10 rounded-[2rem] shadow-xl border border-slate-100">
           <div className="lg:hidden mb-8 flex justify-center">
             <Link to="/" className="flex items-center gap-2">
               <div className="bg-[#2F858E] rounded-xl p-2 text-white"><Shield size={24} className="stroke-[2.5]" /></div>
@@ -115,13 +146,18 @@ export default function RegisterPage() {
           </div>
           
           <h2 className="text-3xl font-bold text-[#222B33] mb-2">Create account</h2>
-          <p className="text-slate-500 mb-8 font-medium">Enter your details to get started.</p>
+          <p className="text-slate-500 mb-8 font-medium">Enter your details to register your student profile.</p>
           
-          {error && <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 border border-red-100">{error}</motion.div>}
+          {error && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 border border-red-100 flex items-start gap-2.5">
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <span>{error}</span>
+            </motion.div>
+          )}
           
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <Input label="Full name" name="name" placeholder="Alex Johnson" value={formData.name} onChange={handleChange} />
-            <Input label="College email" name="email" type="email" placeholder="alex.j@campus.edu" value={formData.email} onChange={handleChange} />
+            <Input label="College email" name="email" type="email" placeholder="alex.j@apsit.edu.in" value={formData.email} onChange={handleChange} />
             
             <div className="relative">
               <label className="block text-sm font-bold text-[#222B33] mb-1.5">Password</label>
@@ -142,14 +178,14 @@ export default function RegisterPage() {
               <input type="password" name="confirmPassword" className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-[#222B33] placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2F858E] focus:bg-white transition-all shadow-sm" placeholder="••••••••" value={formData.confirmPassword} onChange={handleChange} />
             </div>
             
-            <button type="submit" className="w-full h-12 bg-[#222B33] hover:bg-black text-white rounded-xl font-bold text-base mt-6 transition-all shadow-lg hover:shadow-xl flex items-center justify-center disabled:opacity-70" disabled={loading}>
+            <button type="submit" className="w-full h-12 bg-[#222B33] hover:bg-black text-white rounded-xl font-bold text-base mt-6 transition-all shadow-lg hover:shadow-xl flex items-center justify-center disabled:opacity-70 active:scale-[0.99]" disabled={loading}>
               {loading ? <span className="flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />Creating account...</span> : 'Create account'}
             </button>
           </form>
 
           <div className="mt-6 flex items-center justify-between">
             <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
-            <span className="text-xs text-slate-500 font-medium uppercase">Or continue with</span>
+            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Or continue with</span>
             <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
           </div>
 

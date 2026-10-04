@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Shield, Eye, EyeOff } from 'lucide-react';
+import { Shield, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from '../../components/common/Button';
 import { Input } from '../../components/common/Input';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
@@ -17,12 +16,37 @@ export default function LoginPage() {
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
 
+  const decodeJwtPayload = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
+  };
+
   const handleGoogleSuccess = async (credentialResponse) => {
     setError('');
     setLoading(true);
+
     try {
+      const payload = decodeJwtPayload(credentialResponse.credential);
+      const googleEmail = payload?.email || '';
+
+      // Validate @apsit.edu.in domain requirement for student Google accounts
+      if (googleEmail && !googleEmail.endsWith('@apsit.edu.in') && !googleEmail.includes('admin')) {
+        throw new Error('Google Sign-In is restricted to official @apsit.edu.in student email accounts.');
+      }
+
       const user = await googleLogin(credentialResponse.credential);
-      if (user.role === 'ADMIN') {
+      if (user?.role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
@@ -46,7 +70,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const user = await login(email, password);
-      if (user.role === 'ADMIN') {
+      if (user?.role === 'ADMIN') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
@@ -59,7 +83,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex font-sans">
+    <div className="min-h-screen flex font-sans bg-[#F7EFE5]">
+      {/* Left side brand banner (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 bg-[#2F858E] flex-col justify-between p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-[#E7B5A3]/10 pointer-events-none" />
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-[#EBCFB7]/20 rounded-full blur-[100px] pointer-events-none" />
@@ -86,19 +111,22 @@ export default function LoginPage() {
             Welcome back to a better <span className="text-[#EBCFB7]">campus.</span>
           </h1>
           <p className="text-lg text-white/80 font-medium">
-            Sign in to track your complaints, report new issues, and help maintain our campus infrastructure.
+            Sign in to report issues, track resolutions, and keep your campus infrastructure running smoothly.
           </p>
         </motion.div>
 
-        <div className="relative z-10" />
+        <div className="relative z-10 text-xs text-white/60 font-medium">
+          Official APSIT Campus Resolution Portal
+        </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#F7EFE5]">
+      {/* Right side form container */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-[#F7EFE5]">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="w-full max-w-md py-8 bg-white p-10 rounded-[2rem] shadow-xl border border-slate-100"
+          className="w-full max-w-md py-8 bg-white p-8 sm:p-10 rounded-[2rem] shadow-xl border border-slate-100"
         >
           <div className="lg:hidden mb-8 flex justify-center">
             <Link to="/" className="flex items-center gap-2">
@@ -112,15 +140,16 @@ export default function LoginPage() {
           </div>
 
           <h2 className="text-3xl font-bold text-[#222B33] mb-2">Sign in</h2>
-          <p className="text-slate-500 mb-8 font-medium">Enter your college email and password.</p>
+          <p className="text-slate-500 mb-8 font-medium">Enter your college email and password to access your portal.</p>
 
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 border border-red-100"
+              className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold mb-6 border border-red-100 flex items-start gap-2.5"
             >
-              {error}
+              <AlertCircle size={18} className="shrink-0 mt-0.5" />
+              <span>{error}</span>
             </motion.div>
           )}
 
@@ -128,7 +157,7 @@ export default function LoginPage() {
             <Input
               label="Email address"
               type="email"
-              placeholder="you@campus.edu"
+              placeholder="you@apsit.edu.in"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -156,7 +185,11 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <button type="submit" className="w-full h-12 bg-[#222B33] hover:bg-black text-white rounded-xl font-bold text-base mt-6 transition-all shadow-lg hover:shadow-xl flex items-center justify-center disabled:opacity-70" disabled={loading}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 bg-[#222B33] hover:bg-black text-white rounded-xl font-bold text-base mt-6 transition-all shadow-lg hover:shadow-xl flex items-center justify-center disabled:opacity-70 active:scale-[0.99]"
+            >
               {loading ? (
                 <span className="flex items-center gap-2">
                   <div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
@@ -170,7 +203,7 @@ export default function LoginPage() {
 
           <div className="mt-6 flex items-center justify-between">
             <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
-            <span className="text-xs text-slate-500 font-medium uppercase">Or continue with</span>
+            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Or continue with</span>
             <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
           </div>
 

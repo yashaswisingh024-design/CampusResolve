@@ -132,11 +132,7 @@ export const DashboardLayout = ({ children }) => {
           <div className="flex-1 lg:flex-none"></div>
 
           <div className="flex items-center gap-4">
-            <button className="relative p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-50 transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+            <div className="flex items-center gap-3">
               <div className="flex flex-col items-end hidden sm:flex">
                 <span className="text-sm font-medium text-slate-900">{user?.name}</span>
                 <span className="text-xs text-slate-500 capitalize">{user?.role}</span>
