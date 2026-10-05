@@ -1,0 +1,173 @@
+CONTINUE EXISTING CAMPUSRESOLVE PROJECT — HANDOFF FROM ANOTHER REPLIT SESSION
+
+This project was previously being worked on by another Replit Agent/account.
+
+DO NOT start the project from scratch.
+
+First inspect the current GitHub/main branch code and continue from the CURRENT STATE of the repository.
+
+PROJECT:
+CampusResolve
+
+Frontend:
+React + Vite + Tailwind CSS
+
+Backend:
+Spring Boot + MySQL
+Backend is being developed/tested separately by my friend.
+
+IMPORTANT CURRENT STATE:
+
+1. The CampusResolve LANDING PAGE has already been redesigned with the new UI/visual style.
+
+2. The main remaining task is to bring the SAME CampusResolve visual design language to the INNER PAGES.
+
+Inner pages that need visual consistency:
+
+STUDENT:
+- Login
+- Register/Create Account
+- Student Dashboard
+- Report Issue
+- My Complaints
+- Complaint Details
+- Feedback
+
+ADMIN:
+- Admin Dashboard
+- Admin Complaint Management
+- Analytics
+- Admin Complaint Details
+
+Do NOT redesign the landing page again unless necessary.
+
+The inner pages should use the landing page's:
+- color system
+- typography
+- cards
+- buttons
+- spacing
+- gradients
+- borders
+- shadows
+- animations
+- overall visual language
+
+BUT keep each page's existing purpose and functionality.
+
+Do NOT turn every page into a copy of the landing page.
+
+==================================================
+IMPORTANT BACKEND CONTRACT
+==================================================
+
+Roles:
+STUDENT
+ADMIN
+
+Complaint ID:
+complaintId
+
+NOT:
+complaint.id
+
+Statuses:
+SUBMITTED
+UNDER REVIEW
+IN PROGRESS
+RESOLVED
+
+Do NOT use:
+IN_PROGRESS
+ASSIGNED
+
+Categories ONLY:
+
+Infrastructure & Facilities
+IT & Technical
+Water & Sanitation
+Academic
+Fees & Accounts
+Library
+Hostel & Accommodation
+
+Backend local URL:
+http://localhost:8080
+
+Do NOT replace real backend data with mock data.
+
+==================================================
+IMPORTANT FIXES ALREADY REQUESTED
+==================================================
+
+- Remove unnecessary Departments page/department assignment UI.
+- Impact navigation must actually scroll to the Impact section.
+- Remove the notification bell if it has no functionality.
+- Report Issue image upload uses multipart/form-data.
+- Image accepts JPG/JPEG/PNG.
+- complaint.id must be replaced with complaint.complaintId everywhere.
+- Do not generate complaint IDs in the frontend.
+- Backend generates complaintId.
+- Preserve userId from login/AuthContext.
+- Do not create fake user IDs.
+
+==================================================
+LOGIN / REGISTER
+==================================================
+
+There was an accidental CampusLoop implementation pushed previously.
+
+CampusResolve MUST NOT contain CampusLoop login/register UI, branding, content or authentication logic.
+
+Login and Register must be genuine CampusResolve pages.
+
+They should visually match the NEW CampusResolve landing-page design.
+
+Keep the real CampusResolve backend authentication.
+
+Google Sign-In is also planned for APSIT accounts:
+
+@apsit.edu.in
+
+Do NOT create fake Google authentication.
+
+==================================================
+CURRENT TESTING STATUS
+==================================================
+
+The frontend production build was already reported as passing.
+
+The previous Replit Agent also confirmed that the backend was NOT running at localhost:8080 in its environment.
+
+Therefore:
+
+DO NOT assume real API/login/database functionality is available in Replit.
+
+Do NOT seed fake complaint/stat data just to make pages appear populated.
+
+Focus on:
+1. inspecting the current code
+2. completing the inner-page UI consistency
+3. checking routes/rendering
+4. preserving backend integration
+
+==================================================
+VERY IMPORTANT
+==================================================
+
+Do NOT automatically:
+- deploy
+- push to GitHub
+- create a new architecture
+- replace backend APIs
+- add mock data
+- rewrite working functionality
+
+First inspect the current repository and tell me:
+1. what has already been completed
+2. which inner pages still use the old UI
+3. which files need modification
+
+Then continue the implementation from the existing state.
+
+Do not undo valid work that is already present in the repository.

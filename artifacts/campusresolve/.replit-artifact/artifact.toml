@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "CampusResolve"
+description = "The existing CampusResolve student and administrator complaint portal frontend. Report, track, and resolve campus issues using the existing Spring Boot API; the backend remains separately maintained."
+version = "1.0.0"
+id = "artifacts/campusresolve"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26268
+
+[services.development]
+run = "pnpm --filter @workspace/campusresolve run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/campusresolve", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/campusresolve/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26268"
+BASE_PATH = "/"

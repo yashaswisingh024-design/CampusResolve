@@ -1,0 +1,1 @@
+- [CampusResolve backend boundary](campusresolve-backend-boundary.md) — Keep the separately maintained API intact; frontend work must preserve its contract and avoid mock data.
