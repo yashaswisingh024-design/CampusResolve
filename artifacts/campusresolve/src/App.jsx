@@ -14,11 +14,7 @@ import Analytics from './pages/admin/Analytics';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user, isLoading } = useAuth();
-  const visualInspection =
-    import.meta.env.DEV &&
-    new URLSearchParams(window.location.search).get('visual-inspection') === '1';
 
-  if (visualInspection) return children;
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
