@@ -4,7 +4,6 @@ import { Shield, EyeOff, CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Input } from '../../components/common/Input';
 import { authApi } from '../../api/apiClient';
-import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 
 export default function RegisterPage() {
@@ -14,50 +13,6 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const { googleLogin } = useAuth();
-
-  const decodeJwtPayload = (token) => {
-    try {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      return JSON.parse(jsonPayload);
-    } catch {
-      return null;
-    }
-  };
-
-  const handleGoogleSuccess = async (credentialResponse) => {
-    setError('');
-    setLoading(true);
-
-    try {
-      const payload = decodeJwtPayload(credentialResponse.credential);
-      const googleEmail = payload?.email || '';
-
-      // Validate @apsit.edu.in domain requirement for student Google accounts
-      if (googleEmail && !googleEmail.endsWith('@apsit.edu.in') && !googleEmail.includes('admin')) {
-        throw new Error('Google Sign-In is restricted to official @apsit.edu.in student email accounts.');
-      }
-
-      const user = await googleLogin(credentialResponse.credential);
-      if (user?.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
-      }
-    } catch (err) {
-      setError(err.message || 'Google Sign-In failed.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const getPasswordStrength = () => {
@@ -182,24 +137,6 @@ export default function RegisterPage() {
               {loading ? <span className="flex items-center gap-2"><div className="h-4 w-4 rounded-full border-2 border-white border-t-transparent animate-spin" />Creating account...</span> : 'Create account'}
             </button>
           </form>
-
-          <div className="mt-6 flex items-center justify-between">
-            <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Or continue with</span>
-            <span className="border-b border-slate-200 w-1/5 lg:w-1/4"></span>
-          </div>
-
-          <div className="mt-6 flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google Sign-In failed')}
-              useOneTap
-              theme="outline"
-              size="large"
-              width="100%"
-            />
-          </div>
-          
           <p className="mt-8 text-center text-sm text-slate-500 font-medium">Already have an account?{' '}<Link to="/login" className="font-bold text-[#2F858E] hover:text-[#222B33] transition-colors">Sign in</Link></p>
         </motion.div>
       </div>

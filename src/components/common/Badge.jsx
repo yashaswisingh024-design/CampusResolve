@@ -3,12 +3,13 @@ import { cn } from '../../utils/cn';
 
 export const Badge = ({ className, variant = 'default', children }) => {
   const variants = {
-    default: 'bg-slate-100 text-slate-800',
-    primary: 'bg-primary-soft text-primary-accent',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-amber-100 text-amber-800',
-    danger: 'bg-red-100 text-red-800',
-    info: 'bg-blue-100 text-blue-800',
+    default: 'bg-[#eee9df] text-[#53636a]',
+    secondary: 'bg-[#eee9df] text-[#53636a]',
+    primary: 'bg-[#e3f0ed] text-[#286f75]',
+    success: 'bg-[#e7f0e6] text-[#456d50]',
+    warning: 'bg-[#f7efd9] text-[#89652c]',
+    danger: 'bg-[#f8e9e4] text-[#9d4f42]',
+    info: 'bg-[#e3f0ed] text-[#286f75]',
   };
 
   return (

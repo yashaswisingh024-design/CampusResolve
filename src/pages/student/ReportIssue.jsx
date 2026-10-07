@@ -75,11 +75,12 @@ formDataToSend.append(
     return (
       <DashboardLayout>
         <div className="max-w-2xl mx-auto mt-10">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-10 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={40} className="text-green-600" /></div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Complaint Submitted Successfully</h2>
-            <p className="text-slate-600 mb-2">Your issue has been reported and sent to the campus desk for review.</p>
-            {newComplaintId && <p className="text-sm text-slate-500 mb-6">Complaint ID: <strong>CR-{newComplaintId}</strong></p>}
+          <div className="surface p-8 sm:p-10 text-center">
+            <div className="w-20 h-20 bg-[#e3f0ed] rounded-[1.6rem] flex items-center justify-center mx-auto mb-6"><CheckCircle2 size={38} className="text-[#2F858E]" /></div>
+            <p className="text-[10px] uppercase tracking-[.2em] font-bold text-[#2F858E] mb-2">Report received</p>
+            <h2 className="text-2xl font-extrabold text-[#222B33] mb-2">Your voice is in the right place.</h2>
+            <p className="text-[#718084] mb-2">The campus team can now review your issue and begin the next step.</p>
+            {newComplaintId && <p className="text-sm text-[#718084] mb-6">Complaint ID: <strong className="text-[#222B33]">CR-{newComplaintId}</strong></p>}
             <div className="flex gap-4 justify-center">
               <Button variant="outline" onClick={() => navigate('/dashboard')}>Back to Dashboard</Button>
               <Button onClick={() => navigate('/complaints')}>Track Complaint</Button>
@@ -94,17 +95,18 @@ formDataToSend.append(
     <DashboardLayout>
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Report an Issue</h1>
-          <p className="text-slate-500 mt-1">Provide details about the problem to help us resolve it faster.</p>
+          <p className="text-[10px] uppercase tracking-[.2em] font-bold text-[#2F858E] mb-2">Make it actionable</p>
+          <h1 className="text-3xl font-extrabold text-[#222B33] tracking-tight">Report an issue</h1>
+          <p className="text-[#718084] mt-2">Share what happened, where it happened, and what would help.</p>
         </div>
-        {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm font-medium mb-6">{error}</div>}
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-6 md:p-8 space-y-6">
+        {error && <div role="alert" className="bg-[#f8e9e4] text-[#9d4f42] p-4 rounded-xl text-sm font-semibold mb-6">{error}</div>}
+        <form onSubmit={handleSubmit} className="surface overflow-hidden">
+          <div className="p-5 sm:p-8 space-y-7">
           <Input label={<>Complaint Title <span className="text-red-500">*</span></>}name="title"placeholder="e.g., Broken projector, Water leakage"value={formData.title}onChange={handleChange}/>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Category <span className="text-red-500">*</span></label>
-                <select name="category" className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-accent shadow-sm" value={formData.category} onChange={handleChange} >
+                <label className="block text-sm font-semibold text-[#53636a] mb-2">Category <span className="text-[#b85d4a]">*</span></label>
+                <select name="category" className="flex h-11 w-full border bg-[#fffdfa] px-3 py-2 text-sm text-[#222B33] focus:outline-none focus:ring-2 shadow-sm" value={formData.category} onChange={handleChange} >
                   <option value="">Select Category</option>
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
@@ -113,44 +115,45 @@ formDataToSend.append(
             </div>
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-sm font-medium text-slate-700">Description <span className="text-red-500">*</span></label>
-                <span className="text-xs text-slate-400">{formData.description.length}/500</span>
+                <label className="block text-sm font-semibold text-[#53636a]">Description <span className="text-[#b85d4a]">*</span></label>
+                <span className="text-xs text-[#97a1a0]">{formData.description.length}/500</span>
               </div>
-              <textarea name="description" rows={5} className="flex w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-accent shadow-sm resize-none" placeholder="Please describe the issue in detail..." value={formData.description} onChange={handleChange} maxLength={500}  />
+              <textarea name="description" rows={5} className="flex w-full border bg-[#fffdfa] px-4 py-3 text-sm text-[#222B33] focus:outline-none focus:ring-2 shadow-sm resize-y" placeholder="Please describe the issue in detail..." value={formData.description} onChange={handleChange} maxLength={500}  />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Evidence / Photos (Optional)</label>
-              <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors cursor-pointer">
+              <label className="block text-sm font-semibold text-[#53636a] mb-2">Evidence / photos <span className="text-[#97a1a0] font-normal">(optional)</span></label>
+              <div className="border-2 border-dashed border-[#d6ccbe] rounded-2xl p-7 text-center hover:bg-[#f9f4ed] transition-colors cursor-pointer">
   <label className="cursor-pointer">
-    <div className="mx-auto w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-3 text-slate-500">
+    <div className="mx-auto w-12 h-12 bg-[#e3f0ed] rounded-2xl flex items-center justify-center mb-3 text-[#2F858E]">
       <Upload size={24} />
     </div>
 
-    <p className="text-sm font-medium text-slate-900">
+    <p className="text-sm font-semibold text-[#222B33]">
       Click to upload an image
     </p>
 
-    <p className="text-xs text-slate-500 mt-1">
+    <p className="text-xs text-[#718084] mt-1">
       JPG, PNG or JPEG
     </p>
 
     <input
       type="file"
       accept="image/png,image/jpeg,image/jpg"
-      className="hidden"
+      className="sr-only"
+      aria-label="Upload evidence image"
       onChange={(e) => setSelectedImage(e.target.files[0])}
     />
   </label>
 
   {selectedImage && (
-    <p className="text-sm text-green-600 mt-3 font-medium">
+    <p className="text-sm text-[#2F858E] mt-3 font-semibold">
       Selected: {selectedImage.name}
     </p>
   )}
             </div>
             </div>
           </div>
-          <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-end gap-3">
+          <div className="bg-[#f7f1e9] px-5 sm:px-8 py-4 border-t border-[#e8dfd3] flex items-center justify-end gap-3">
             <Button type="button" variant="ghost" onClick={() => navigate('/dashboard')}>Cancel</Button>
             <Button type="submit" disabled={loading}>{loading ? 'Submitting...' : 'Submit Complaint'}</Button>
           </div>

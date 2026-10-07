@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings2, AlertTriangle } from 'lucide-react';
+import { Settings2, AlertTriangle, X, Star } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Badge } from '../../components/common/Badge';
 import { Button } from '../../components/common/Button';
@@ -84,40 +84,40 @@ export default function AdminComplaints() {
 
   return (
     <DashboardLayout>
-      <div className="mb-8"><h1 className="text-2xl font-bold text-slate-900 tracking-tight">Complaint Management</h1><p className="text-slate-500 mt-1">Review, assign, and update student issues.</p></div>
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
-        <div className="p-4 border-b border-slate-200 flex flex-col lg:flex-row gap-4">
+      <div className="mb-8"><p className="text-[10px] uppercase tracking-[.2em] font-bold text-[#2F858E] mb-2">Operations queue</p><h1 className="text-3xl font-extrabold text-[#222B33] tracking-tight">Complaint management</h1><p className="text-[#718084] mt-2">Review each report and make its next action clear.</p></div>
+      <div className="surface overflow-hidden mb-6">
+        <div className="p-4 sm:p-5 border-b border-[#e8dfd3] flex flex-col lg:flex-row gap-4">
           <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full">
-            <select className="w-full sm:w-auto border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-accent bg-white" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <select aria-label="Filter complaints by status" className="w-full sm:w-auto border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 bg-[#fffdfa]" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="">All Statuses</option>
               {STATUSES.map(s => <option key={s} value={s}>{formatStatus(s)}</option>)}
             </select>
-            <select className="w-full sm:w-auto border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-accent bg-white" value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
+            <select aria-label="Filter complaints by priority" className="w-full sm:w-auto border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 bg-[#fffdfa]" value={priorityFilter} onChange={(e) => setPriorityFilter(e.target.value)}>
               <option value="">All Priorities</option>
               {PRIORITIES.map(p => <option key={p} value={p}>{p.charAt(0) + p.slice(1).toLowerCase()}</option>)}
             </select>
-            <select className="w-full sm:w-auto border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-accent bg-white" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+            <select aria-label="Filter complaints by category" className="w-full sm:w-auto border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 bg-[#fffdfa]" value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
               <option value="">All Categories</option>
               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
         </div>
         <div className="overflow-x-auto">
-          {loading ? <div className="p-8 text-center text-slate-500">Loading complaints...</div>
-          : error ? <div className="p-8 text-center text-red-500">{error}</div>
+          {loading ? <div className="p-6 space-y-3">{[1,2,3,4].map(i => <div key={i} className="h-14 animate-pulse rounded-lg bg-[#f4eee6]" />)}</div>
+          : error ? <div role="alert" className="p-8 text-center text-[#9d5c4d]">{error}<button onClick={fetchComplaints} className="block mx-auto mt-3 font-bold text-[#2F858E]">Try again</button></div>
           : <table className="w-full text-left border-collapse">
-            <thead><tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-xs uppercase tracking-wider">
-              <th className="p-4 font-medium">Issue</th><th className="p-4 font-medium">Category / Location</th><th className="p-4 font-medium">Status</th><th className="p-4 font-medium text-right">Actions</th>
+            <thead><tr className="border-b border-[#e8dfd3] text-xs uppercase tracking-wider">
+              <th className="p-4 font-bold">Issue</th><th className="p-4 font-bold">Category / Location</th><th className="p-4 font-bold">Status / Priority</th><th className="p-4 font-bold text-right">Next action</th>
             </tr></thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#f0e9df]">
               {complaints.length > 0 ? complaints.map(c => (
-                <tr key={c.complaintId} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4"><div className="font-semibold text-slate-900 mb-0.5 flex items-center gap-2">CR-{c.complaintId}{c.priority?.toUpperCase() === 'HIGH' && <AlertTriangle size={14} className="text-red-500" />}</div><div className="text-sm font-medium text-slate-700 truncate max-w-xs">{c.title}</div></td>
-                  <td className="p-4"><div className="text-sm font-medium text-slate-900">{c.category}</div><div className="text-xs text-slate-500">{c.location}</div></td>
-                  <td className="p-4"><Badge variant={getStatusColor(c.status)}>{formatStatus(c.status)}</Badge></td>
-                  <td className="p-4 text-right"><button onClick={() => openModal(c)} className="p-2 text-primary-accent hover:bg-blue-50 rounded-lg transition-colors inline-flex items-center gap-1 text-sm font-medium"><Settings2 size={16} /> {c.status?.toUpperCase() === 'RESOLVED' ? 'View' : 'Manage'}</button></td>
+                <tr key={c.complaintId} className="hover:bg-[#fbf7f1] transition-colors">
+                  <td className="p-4"><div className="font-bold text-[#2F858E] mb-0.5 flex items-center gap-2 text-xs">CR-{c.complaintId}{c.priority?.toUpperCase() === 'HIGH' && <AlertTriangle size={14} className="text-[#a95042]" />}</div><div className="text-sm font-semibold text-[#222B33] truncate max-w-xs">{c.title}</div></td>
+                  <td className="p-4"><div className="text-sm font-medium text-[#53636a]">{c.category}</div><div className="text-xs text-[#97a1a0] mt-1">{c.location}</div></td>
+                  <td className="p-4"><div className="flex flex-col items-start gap-1.5"><Badge variant={getStatusColor(c.status)}>{formatStatus(c.status)}</Badge><span className="text-[10px] uppercase tracking-wider font-bold text-[#718084]">{c.priority || 'Pending'} priority</span></div></td>
+                  <td className="p-4 text-right"><button onClick={() => openModal(c)} className="p-2.5 text-[#2F858E] hover:bg-[#e3f0ed] rounded-xl transition-colors inline-flex items-center gap-1 text-sm font-semibold"><Settings2 size={16} /> {c.status?.toUpperCase() === 'RESOLVED' ? 'View' : 'Manage'}</button></td>
                 </tr>
-              )) : <tr><td colSpan="4" className="p-8 text-center text-slate-500">No complaints found.</td></tr>}
+                )) : <tr><td colSpan="4" className="p-10 text-center text-[#718084]">No complaints found for these filters.</td></tr>}
             </tbody>
           </table>}
         </div>
@@ -125,15 +125,15 @@ export default function AdminComplaints() {
 
       {isModalOpen && selectedComplaint && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl relative my-auto">
-            <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-              <div><h2 className="text-xl font-bold text-slate-900">
+          <div role="dialog" aria-modal="true" aria-labelledby="complaint-modal-title" className="bg-[#fffdfa] rounded-2xl max-w-2xl w-full shadow-2xl relative my-auto border border-[#e8dfd3]">
+            <div className="p-5 sm:p-6 border-b border-[#eee5d9] flex justify-between items-center">
+              <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#2F858E]">Complaint CR-{selectedComplaint.complaintId}</p><h2 id="complaint-modal-title" className="text-xl font-extrabold text-[#222B33] mt-1">
   {selectedComplaint.status?.toUpperCase() === 'RESOLVED'? 'View Complaint': 'Manage Complaint'}</h2><p className="text-sm text-slate-500">ID: CR-{selectedComplaint.complaintId}</p></div>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors">✕</button>
+              <button aria-label="Close complaint details" onClick={() => setIsModalOpen(false)} className="p-2 text-[#718084] hover:text-[#222B33] hover:bg-[#f2ece4] rounded-full transition-colors"><X size={20} /></button>
             </div>
             <div className="p-6">
-              <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 mb-6 space-y-3">
-  <p className="font-semibold text-slate-900">{selectedComplaint.title}</p>
+              <div className="bg-[#f8f3ec] rounded-xl p-4 border border-[#eee5d9] mb-6 space-y-3">
+  <p className="font-bold text-[#222B33]">{selectedComplaint.title}</p>
 
   <p className="text-sm text-slate-700">
     {selectedComplaint.description}
@@ -153,13 +153,13 @@ export default function AdminComplaints() {
       <img
         src={`http://localhost:8080/api/complaints/images/${selectedComplaint.image}`}
         alt="Complaint evidence"
-        className="max-w-full max-h-80 rounded-lg border border-slate-200 object-contain"
+    className="max-w-full max-h-80 rounded-lg border border-[#e8dfd3] object-contain"
       />
     </div>
   )}
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 p-4 mb-6">
-  <h3 className="font-semibold text-slate-900 mb-3">
+              <div className="bg-white rounded-xl border border-[#e8dfd3] p-4 mb-6">
+  <h3 className="font-bold text-[#222B33] mb-3">
     Resolution Feedback
   </h3>
 
@@ -169,20 +169,11 @@ export default function AdminComplaints() {
     <>
       <div className="flex items-center gap-1 mb-2">
         {[1, 2, 3, 4, 5].map((star) => (
-          <span
-            key={star}
-            className={
-              star <= feedback.rating
-                ? 'text-yellow-400 text-lg'
-                : 'text-slate-300 text-lg'
-            }
-          >
-            ★
-          </span>
+          <Star key={star} size={18} className={star <= feedback.rating ? 'fill-[#d69a55] text-[#d69a55]' : 'text-[#d8d0c5]'} />
         ))}
       </div>
 
-      <p className="text-sm text-slate-700">
+      <p className="text-sm text-[#53636a]">
         {feedback.comment || 'No comment provided.'}
       </p>
     </>
@@ -214,8 +205,8 @@ export default function AdminComplaints() {
         Update Status
       </label>
 
-      <select
-        className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-accent shadow-sm"
+       <select
+         className="flex h-11 w-full border bg-[#fffdfa] px-3 py-2 text-sm text-[#222B33] focus:outline-none focus:ring-2 shadow-sm"
         value={editStatus}
         onChange={(e) => setEditStatus(e.target.value)}
         disabled={selectedComplaint.status?.toUpperCase() === 'RESOLVED'}
@@ -233,8 +224,8 @@ export default function AdminComplaints() {
         Update Priority
       </label>
 
-      <select
-        className="flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-accent shadow-sm"
+       <select
+         className="flex h-11 w-full border bg-[#fffdfa] px-3 py-2 text-sm text-[#222B33] focus:outline-none focus:ring-2 shadow-sm"
         value={editPriority}
         onChange={(e) => setEditPriority(e.target.value)}
         disabled={selectedComplaint.status?.toUpperCase() === 'RESOLVED'}
