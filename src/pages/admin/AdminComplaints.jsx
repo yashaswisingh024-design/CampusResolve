@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Settings2, AlertTriangle, X, Star } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { Badge } from '../../components/common/Badge';
@@ -122,16 +123,20 @@ export default function AdminComplaints() {
           </table>}
         </div>
       </div>
-
-      {isModalOpen && selectedComplaint && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm overflow-y-auto">
-          <div role="dialog" aria-modal="true" aria-labelledby="complaint-modal-title" className="bg-[#fffdfa] rounded-2xl max-w-2xl w-full shadow-2xl relative my-auto border border-[#e8dfd3]">
+{isModalOpen && selectedComplaint && createPortal(
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+      
+<div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="complaint-modal-title"
+className="bg-[#fffdfa] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative border border-[#e8dfd3]">
             <div className="p-5 sm:p-6 border-b border-[#eee5d9] flex justify-between items-center">
               <div><p className="text-[10px] font-bold uppercase tracking-[.18em] text-[#2F858E]">Complaint CR-{selectedComplaint.complaintId}</p><h2 id="complaint-modal-title" className="text-xl font-extrabold text-[#222B33] mt-1">
   {selectedComplaint.status?.toUpperCase() === 'RESOLVED'? 'View Complaint': 'Manage Complaint'}</h2><p className="text-sm text-slate-500">ID: CR-{selectedComplaint.complaintId}</p></div>
               <button aria-label="Close complaint details" onClick={() => setIsModalOpen(false)} className="p-2 text-[#718084] hover:text-[#222B33] hover:bg-[#f2ece4] rounded-full transition-colors"><X size={20} /></button>
             </div>
-            <div className="p-6">
+            <div className="p-6 overflow-y-auto">
               <div className="bg-[#f8f3ec] rounded-xl p-4 border border-[#eee5d9] mb-6 space-y-3">
   <p className="font-bold text-[#222B33]">{selectedComplaint.title}</p>
 
@@ -257,8 +262,8 @@ export default function AdminComplaints() {
               </form>
             </div>
           </div>
-        </div>
-      )}
+                </div>
+      , document.body)}
     </DashboardLayout>
   );
 }
