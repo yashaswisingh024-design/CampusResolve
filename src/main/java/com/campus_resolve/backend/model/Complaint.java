@@ -1,5 +1,5 @@
 package com.campus_resolve.backend.model;
-
+import java.sql.Timestamp;
 public class Complaint {
     private int complaintId;
     private int userId;
@@ -10,6 +10,7 @@ public class Complaint {
     private String priority;
     private String status;
     private String image;
+    private Timestamp createdAt;
 public int getComplaintId(){
     return complaintId;
 }
@@ -64,6 +65,11 @@ this.priority=priority;
 public void setImage(String image){
 this.image=image;
 }
+public Timestamp getCreatedAt(){
+    return createdAt;
+}
 
-    
+public void setCreatedAt(Timestamp createdAt){
+    this.createdAt = createdAt;
+}
 }

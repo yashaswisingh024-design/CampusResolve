@@ -3,6 +3,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import com.campus_resolve.backend.model.Complaint;
+import java.sql.Timestamp;
 public class ComplaintDAO {
     Connection con;
 public ComplaintDAO() throws SQLException{
@@ -125,6 +126,8 @@ public List<Complaint> getFilteredComplaints(String category,String priority,Str
             complaint.setPriority(v);
             String i=rs.getString("image");
             complaint.setImage(i);
+            Timestamp createdAt = rs.getTimestamp("created_at");
+            complaint.setCreatedAt(createdAt);
             Comp.add(complaint);
         }
         return Comp;
